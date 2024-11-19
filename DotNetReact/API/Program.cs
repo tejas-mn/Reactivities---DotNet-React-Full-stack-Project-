@@ -1,3 +1,4 @@
+using API.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
@@ -5,14 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddAuthentication();
-builder.Services.AddAuthentication();
-builder.Services.AddControllers();
-builder.Services.AddDbContext<DataContext>( opt => {
-    opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
+
+builder.Services.AddAppServices(builder.Configuration);
 
 var app = builder.Build();
 
@@ -33,6 +28,7 @@ var services = scope.ServiceProvider;
 try{
     var context = services.GetRequiredService<DataContext>();
     context.Database.Migrate(); //runs migration to create tables in db
+    _ = Seed.SeedData(context);
 
 }catch(Exception ex){
     var logger = services.GetRequiredService<ILogger<Program>>();
