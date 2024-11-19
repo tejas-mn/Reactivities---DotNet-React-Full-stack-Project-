@@ -1,33 +1,26 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { act, useEffect, useState } from 'react'
 import './App.css'
+import axios from 'axios';
+import { Header, List } from 'semantic-ui-react';
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const [activities, setActivities] = useState([]);
+  
+  useEffect(()=>{
+    axios.get('https://super-duper-xylophone-jw7qvvx99gc967-5035.app.github.dev/api/activities/')
+      .then( res => {
+        setActivities(res.data);
+      })
+  }, [])
   return (
+    
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+     <Header as='h2' icon='users' content='DotNetReact ' />
+     <List>
+      {
+        activities.map((a : any) =>  <List.Item key={a.id}>{a.title}</List.Item>)
+      }
+     </List>
     </>
   )
 }
