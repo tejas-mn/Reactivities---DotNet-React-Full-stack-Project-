@@ -1,5 +1,7 @@
+using Application.Core;
 using AutoMapper;
 using Domain;
+using FluentValidation;
 using MediatR;
 using Persistence;
 
@@ -7,12 +9,20 @@ namespace Application.Activities
 {
     public class Edit
     {
-        public class Command : IRequest
+        public class Command : IRequest<Result<Unit>>
         {
             public Activity Activity {get; set;}
         }
 
-        public class Handler : IRequestHandler<Command>
+        public class CommandValidator : AbstractValidator<Command>
+        {
+            public CommandValidator()
+            {
+                RuleFor(c => c.Activity).SetValidator(new ActivityValidator());
+            }
+        }
+
+        public class Handler : IRequestHandler<Command, Result<Unit>>
         {
             private readonly DataContext _context;
             private readonly IMapper _mapper;
@@ -23,13 +33,32 @@ namespace Application.Activities
                 _context = context;
             }
 
-            public async Task Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var activity = await _context.Activities.FindAsync(request.Activity.Id);
+                try
+                {
+                    var activity = await _context.Activities.FindAsync(request.Activity.Id);
                 
-                _mapper.Map(request.Activity, activity);
-                
-                await _context.SaveChangesAsync();
+                    if(activity == null)
+                    {
+                        return null;
+                    }
+                    
+                    _mapper.Map(request.Activity, activity);
+
+                    var result = await _context.SaveChangesAsync() > 0;
+
+                    if(!result){
+                        return Result<Unit>.Failure("Failed to edit activity");
+                    }      
+                }
+                catch (Exception)
+                {
+                    return Result<Unit>.Failure("Failed to edit activity");
+                }
+
+                return Result<Unit>.Success(Unit.Value); 
+ 
 
             }
         }
