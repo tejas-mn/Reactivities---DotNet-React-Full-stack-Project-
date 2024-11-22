@@ -1,5 +1,7 @@
 using API.Extensions;
 using API.Middleware;
+using Domain;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
@@ -8,7 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 builder.Services.AddAppServices(builder.Configuration);
+builder.Services.AddIdentityServices(builder.Configuration);
 
 var app = builder.Build();
 
@@ -31,8 +36,9 @@ var services = scope.ServiceProvider;
 
 try{
     var context = services.GetRequiredService<DataContext>();
+    var userManager = services.GetRequiredService<UserManager<AppUser>>(); //gets userManager for AppUser to inject the service into SeedData method
     context.Database.Migrate(); //runs migration to create tables in db
-    _ = Seed.SeedData(context);
+    await Seed.SeedData(context, userManager);
 
 }catch(Exception ex){
     var logger = services.GetRequiredService<ILogger<Program>>();
