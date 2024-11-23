@@ -5,36 +5,38 @@ namespace Persistence
 {
     public class Seed
     {
-        public static async Task SeedData(DataContext context, UserManager<AppUser> userManager)
+        public static async Task SeedData(DataContext context,
+            UserManager<AppUser> userManager)
         {
-            if(!userManager.Users.Any())
+            if (!userManager.Users.Any() && !context.Activities.Any())
             {
                 var users = new List<AppUser>
                 {
-                    new AppUser {
+                    new AppUser
+                    {
                         DisplayName = "Bob",
                         UserName = "bob",
-                        Email = "bob@gmail.com"
+                        Email = "bob@test.com"
                     },
-                    new AppUser {
+                    new AppUser
+                    {
+                        DisplayName = "Jane",
+                        UserName = "jane",
+                        Email = "jane@test.com"
+                    },
+                    new AppUser
+                    {
                         DisplayName = "Tom",
                         UserName = "tom",
-                        Email = "tom@gmail.com"
+                        Email = "tom@test.com"
                     },
-                    new AppUser {
-                        DisplayName = "Mike",
-                        UserName = "mike",
-                        Email = "mike@gmail.com"
-                    }
-
                 };
 
-                foreach(var user in users){
-                    await userManager.CreateAsync(user, "Passw0rd");
+                foreach (var user in users)
+                {
+                    await userManager.CreateAsync(user, "Pa$$w0rd");
                 }
-            }
-            if (!context.Activities.Any())
-            {
+
                 var activities = new List<Activity>
                 {
                     new Activity
@@ -44,7 +46,15 @@ namespace Persistence
                         Description = "Activity 2 months ago",
                         Category = "drinks",
                         City = "London",
-                        Venue = "Pub"
+                        Venue = "Pub",
+                        Attendees = new List<ActivityAttendee>
+                        {
+                            new ActivityAttendee
+                            {
+                                AppUser = users[0],
+                                IsHost = true
+                            }
+                        }
                     },
                     new Activity
                     {
@@ -54,6 +64,19 @@ namespace Persistence
                         Category = "culture",
                         City = "Paris",
                         Venue = "The Louvre",
+                        Attendees = new List<ActivityAttendee>
+                        {
+                            new ActivityAttendee
+                            {
+                                AppUser = users[0],
+                                IsHost = true
+                            },
+                            new ActivityAttendee
+                            {
+                                AppUser = users[1],
+                                IsHost = false
+                            },
+                        }
                     },
                     new Activity
                     {
@@ -62,8 +85,20 @@ namespace Persistence
                         Description = "Activity 1 month in future",
                         Category = "music",
                         City = "London",
-                        Venue = "Wembly Stadium"
-                       
+                        Venue = "Wembly Stadium",
+                        Attendees = new List<ActivityAttendee>
+                        {
+                            new ActivityAttendee
+                            {
+                                AppUser = users[2],
+                                IsHost = true
+                            },
+                            new ActivityAttendee
+                            {
+                                AppUser = users[1],
+                                IsHost = false
+                            },
+                        }
                     },
                     new Activity
                     {
@@ -72,8 +107,20 @@ namespace Persistence
                         Description = "Activity 2 months in future",
                         Category = "food",
                         City = "London",
-                        Venue = "Jamies Italian"
-                      
+                        Venue = "Jamies Italian",
+                        Attendees = new List<ActivityAttendee>
+                        {
+                            new ActivityAttendee
+                            {
+                                AppUser = users[0],
+                                IsHost = true
+                            },
+                            new ActivityAttendee
+                            {
+                                AppUser = users[2],
+                                IsHost = false
+                            },
+                        }
                     },
                     new Activity
                     {
@@ -82,8 +129,20 @@ namespace Persistence
                         Description = "Activity 3 months in future",
                         Category = "drinks",
                         City = "London",
-                        Venue = "Pub"
-                       
+                        Venue = "Pub",
+                        Attendees = new List<ActivityAttendee>
+                        {
+                            new ActivityAttendee
+                            {
+                                AppUser = users[1],
+                                IsHost = true                            
+                            },
+                            new ActivityAttendee
+                            {
+                                AppUser = users[0],
+                                IsHost = false                            
+                            },
+                        }
                     },
                     new Activity
                     {
@@ -92,8 +151,15 @@ namespace Persistence
                         Description = "Activity 4 months in future",
                         Category = "culture",
                         City = "London",
-                        Venue = "British Museum"
-                       
+                        Venue = "British Museum",
+                        Attendees = new List<ActivityAttendee>
+                        {
+                            new ActivityAttendee
+                            {
+                                AppUser = users[1],
+                                IsHost = true                            
+                            }
+                        }
                     },
                     new Activity
                     {
@@ -102,8 +168,20 @@ namespace Persistence
                         Description = "Activity 5 months in future",
                         Category = "drinks",
                         City = "London",
-                        Venue = "Punch and Judy"
-                        
+                        Venue = "Punch and Judy",
+                        Attendees = new List<ActivityAttendee>
+                        {
+                            new ActivityAttendee
+                            {
+                                AppUser = users[0],
+                                IsHost = true                            
+                            },
+                            new ActivityAttendee
+                            {
+                                AppUser = users[1],
+                                IsHost = false                            
+                            },
+                        }
                     },
                     new Activity
                     {
@@ -112,8 +190,20 @@ namespace Persistence
                         Description = "Activity 6 months in future",
                         Category = "music",
                         City = "London",
-                        Venue = "O2 Arena"
-                      
+                        Venue = "O2 Arena",
+                        Attendees = new List<ActivityAttendee>
+                        {
+                            new ActivityAttendee
+                            {
+                                AppUser = users[2],
+                                IsHost = true                            
+                            },
+                            new ActivityAttendee
+                            {
+                                AppUser = users[1],
+                                IsHost = false                            
+                            },
+                        }
                     },
                     new Activity
                     {
@@ -122,8 +212,20 @@ namespace Persistence
                         Description = "Activity 7 months in future",
                         Category = "travel",
                         City = "Berlin",
-                        Venue = "All"
-                      
+                        Venue = "All",
+                        Attendees = new List<ActivityAttendee>
+                        {
+                            new ActivityAttendee
+                            {
+                                AppUser = users[0],
+                                IsHost = true                            
+                            },
+                            new ActivityAttendee
+                            {
+                                AppUser = users[2],
+                                IsHost = false                            
+                            },
+                        }
                     },
                     new Activity
                     {
@@ -132,8 +234,20 @@ namespace Persistence
                         Description = "Activity 8 months in future",
                         Category = "drinks",
                         City = "London",
-                        Venue = "Pub"
-                      
+                        Venue = "Pub",
+                        Attendees = new List<ActivityAttendee>
+                        {
+                            new ActivityAttendee
+                            {
+                                AppUser = users[2],
+                                IsHost = true                            
+                            },
+                            new ActivityAttendee
+                            {
+                                AppUser = users[1],
+                                IsHost = false                            
+                            },
+                        }
                     }
                 };
 
