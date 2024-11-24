@@ -1,65 +1,31 @@
 import { Grid } from "semantic-ui-react";
-import { Activity } from "../../../app/models/activity";
 import ActivityList from "./ActivityList";
 import ActivityDetails from "../details/ActivityDetails";
 import AcitivityForm from "../form/ActivityForm";
+import { useStore } from "../../../app/stores/store";
+import { observer } from "mobx-react-lite";
 
-interface Props {
-    activities: Activity[],
-    handleSelectActivity: (id: string) => void,
-    handleCancelActivity: () => void,
-    selectedActivity: Activity | undefined,
-    editMode: boolean,
-    handleFormOpen: (id: string) => void,
-    handleFormClose: () => void,
-    handleCreateEditActivity: (activity: Activity) => void,
-    handleDeleteActivity: (id: string) => void,
-    submitting: boolean
-}
+export default observer(function ActivityDashboard() {
 
-export default function ActivityDashboard({
-    activities,
-    selectedActivity,
-    handleSelectActivity,
-    handleCancelActivity,
-    editMode,
-    handleFormClose,
-    handleFormOpen,
-    handleCreateEditActivity,
-    handleDeleteActivity,
-    submitting }: Props) {
+    const { activityStore } = useStore();
 
     return (
         <Grid>
             {/* take 10 columns instead of 16(for semantic ui) for boostrap its 12 column */}
             <Grid.Column width='10'>
-                <ActivityList
-                    activities={activities}
-                    handleSelectActivity={handleSelectActivity}
-                    handleDeleteActivity={handleDeleteActivity}
-                    submitting={submitting}
-                />
+                <ActivityList />
             </Grid.Column>
             <Grid.Column width={6}>
                 {
-                    selectedActivity && !editMode &&
-                    <ActivityDetails
-                        activity={selectedActivity}
-                        handleCancelActivity={handleCancelActivity}
-                        handleFormOpen={handleFormOpen}
-                    />
+                    activityStore.selectedActivity && !activityStore.editMode &&
+                    <ActivityDetails />
                 }
                 {
-                    editMode &&
-                    <AcitivityForm
-                        handleFormClose={handleFormClose}
-                        selectedActivity={selectedActivity}
-                        handleCreateEditActivity={handleCreateEditActivity}
-                        submitting={submitting}
-                    />
+                    activityStore.editMode &&
+                    <AcitivityForm />
                 }
             </Grid.Column>
         </Grid>
 
     )
-}
+});
