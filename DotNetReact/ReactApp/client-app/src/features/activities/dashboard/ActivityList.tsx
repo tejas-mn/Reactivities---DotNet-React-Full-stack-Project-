@@ -9,7 +9,7 @@ export default observer(function ActivityList() {
     const { activityStore } = useStore();
 
     const { groupedActivities } = activityStore;
-    console.log(groupedActivities)
+
     return (
 
         <>
