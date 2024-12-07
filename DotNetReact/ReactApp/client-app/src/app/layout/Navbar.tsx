@@ -9,7 +9,7 @@ export default function NavBar() {
         <Menu inverted fixed='top'>
             <Container>
                 <Menu.Item as={NavLink} to='/' header>
-                    <img src="" alt="Logo" style={{ marginRight: '10px' }} />
+                    <img src="https://png.pngtree.com/png-vector/20240824/ourlarge/pngtree-the-logo-of-nature-with-its-background-png-image_13604277.png" alt="Logo" style={{ marginRight: '10px' }} />
                     DotNetReact
                 </Menu.Item>
                 <Menu.Item  as = {NavLink} to = '/activities' name="Activities" />
