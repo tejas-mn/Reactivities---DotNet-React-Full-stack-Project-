@@ -1,11 +1,5 @@
-import { Formik, Form, Field, FieldProps } from 'formik'
 import { observer } from 'mobx-react-lite'
-import React, { useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { Segment, Header, Comment, Loader } from 'semantic-ui-react'
-import { useStore } from '../../../app/stores/store'
-import * as Yup from 'yup';
-import { formatDistanceToNow } from 'date-fns'
+import { Segment, Header, Comment } from 'semantic-ui-react'
 
 interface Props {
     activityId: string;
@@ -38,7 +32,7 @@ export default observer(function ActivityDetailedChat({ activityId }: Props) {
                 <Header>Chat about this event</Header>
             </Segment>
             <Segment attached clearing>
-            {/* <Formik
+                {/* <Formik
                         onSubmit={(values, { resetForm }) =>
                             commentStore.addComment(values).then(() => resetForm())}
                         initialValues={{ body: '' }}
@@ -74,27 +68,27 @@ export default observer(function ActivityDetailedChat({ activityId }: Props) {
                         )}
                     </Formik> */}
                 <Comment.Group>
-                    
+
                     {
-                    // commentStore.comments.map(comment => (
-                    //     <Comment key={comment.id}>
-                    //         <Comment.Avatar src={comment.image || '/assets/user.png'} />
-                    //         <Comment.Content>
-                    //             <Comment.Author as={Link} to={`/profiles/${comment.username}`} >
-                    //                 {comment.displayName}</Comment.Author>
-                    //             <Comment.Metadata>
-                    //                 <div>{formatDistanceToNow(comment.createdAt)} ago</div>
-                    //             </Comment.Metadata>
-                    //             <Comment.Text style={{whiteSpace: 'pre-wrap'}}>{comment.body}</Comment.Text>
-                    //             {/* <Comment.Actions>
-                    //                 <Comment.Action>Reply</Comment.Action>
-                    //             </Comment.Actions> */}
-                    //         </Comment.Content>
-                    //     </Comment>
-                    // ))
+                        // commentStore.comments.map(comment => (
+                        //     <Comment key={comment.id}>
+                        //         <Comment.Avatar src={comment.image || '/assets/user.png'} />
+                        //         <Comment.Content>
+                        //             <Comment.Author as={Link} to={`/profiles/${comment.username}`} >
+                        //                 {comment.displayName}</Comment.Author>
+                        //             <Comment.Metadata>
+                        //                 <div>{formatDistanceToNow(comment.createdAt)} ago</div>
+                        //             </Comment.Metadata>
+                        //             <Comment.Text style={{whiteSpace: 'pre-wrap'}}>{comment.body}</Comment.Text>
+                        //             {/* <Comment.Actions>
+                        //                 <Comment.Action>Reply</Comment.Action>
+                        //             </Comment.Actions> */}
+                        //         </Comment.Content>
+                        //     </Comment>
+                        // ))
                     }
 
-                                
+
 
                 </Comment.Group>
             </Segment>

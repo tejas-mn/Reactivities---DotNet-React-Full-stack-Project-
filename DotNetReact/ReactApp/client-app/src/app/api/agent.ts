@@ -23,7 +23,7 @@ axios.interceptors.response.use(async res => {
             if (typeof data === 'string') {
                 toast.error(data);
             }
-            
+
             if (config.method === 'get' && data.errors.hasOwnProperty('id')) {
                 router.navigate('/not-found');
             }

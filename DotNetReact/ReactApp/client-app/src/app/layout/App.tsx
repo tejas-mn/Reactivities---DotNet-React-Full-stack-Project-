@@ -11,8 +11,8 @@ function App() {
 
   return (
     <>
-    <ToastContainer position='bottom-right' hideProgressBar theme='colored' />
-    
+      <ToastContainer position='bottom-right' hideProgressBar theme='colored' />
+
       {
         (location.pathname === '/') ? <HomePage /> :
           (
