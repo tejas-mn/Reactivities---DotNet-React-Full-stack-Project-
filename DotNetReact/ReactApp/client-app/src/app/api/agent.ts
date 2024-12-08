@@ -24,11 +24,11 @@ axios.interceptors.response.use(async res => {
                 toast.error(data);
             }
 
-            if (config.method === 'get' && data.errors.hasOwnProperty('id')) {
+            else if (config.method === 'get' && data.errors.hasOwnProperty('id')) {
                 router.navigate('/not-found');
             }
 
-            if (data.errors) {
+            else if (data.errors) {
                 const modalstateErrors = [];
                 for (const key in data.errors) {
                     if (data.errors[key]) {
