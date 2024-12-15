@@ -30,7 +30,7 @@ namespace API.Controllers
             return HandleResult(result);
         }
 
-        [Authorize(Policy = "IsActivityHost")] //only if current logged in user is host then can edit or delete activity
+        // [Authorize(Policy = "IsActivityHost")] //only if current logged in user is host then can edit or delete activity
         [HttpPut("{id}")]
         public async Task<ActionResult> Edit(Guid id, Activity activity)
         {
@@ -39,7 +39,7 @@ namespace API.Controllers
             return HandleResult(result);
         }
 
-        [Authorize(Policy = "IsActivityHost")]
+        // [Authorize(Policy = "IsActivityHost")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {

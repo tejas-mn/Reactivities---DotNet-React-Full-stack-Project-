@@ -28,7 +28,7 @@ namespace API.Controllers
         {
             var user = await _userManager.FindByEmailAsync(loginDto.Email);
 
-            if (user == null) return Unauthorized();
+            if (user == null) return Unauthorized("User with the given email doesn't exist!");
 
             var result = await _userManager.CheckPasswordAsync(user, loginDto.Password);
 
@@ -37,7 +37,7 @@ namespace API.Controllers
                 return CreateUserObject(user);
             }
 
-            return Unauthorized();
+            return Unauthorized("Invalid Password!");
         }
 
         [AllowAnonymous]
@@ -46,12 +46,14 @@ namespace API.Controllers
         {
             if(await _userManager.Users.AnyAsync(x => x.UserName == registerDto.UserName))
             {
-                return BadRequest("UserName is already taken");
+                ModelState.AddModelError("username" , "UserName is already taken");
+                return ValidationProblem();
             }
 
             if(await _userManager.Users.AnyAsync(x => x.Email == registerDto.Email))
             {
-                return BadRequest("Email is already taken");
+                ModelState.AddModelError("email" , "Email is already taken");
+                return ValidationProblem();
             }
 
             var user = new AppUser 
@@ -71,7 +73,6 @@ namespace API.Controllers
             return BadRequest("Failed to register user");
         }
 
-        [Authorize]
         [HttpGet]
         public async Task<ActionResult<UserDto>> GetCurrentUser()
         {

@@ -3,6 +3,7 @@ import { Activity } from "../models/activity";
 import { toast } from "react-toastify";
 import { router } from "../router/Routes";
 import { store } from "../stores/store";
+import { User, UserFormValues } from "../models/user";
 
 const sleep = (delay: number) => {
     return new Promise((resolve) => {
@@ -11,6 +12,12 @@ const sleep = (delay: number) => {
 }
 
 axios.defaults.baseURL = 'https://super-duper-xylophone-jw7qvvx99gc967-5035.app.github.dev/api/';
+
+axios.interceptors.request.use(config => {
+    const token = store.commonStore.token;
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    return config;
+})
 
 axios.interceptors.response.use(async res => {
     await sleep(1000);
@@ -75,8 +82,15 @@ const Activites = {
     delete: (id: string) => requests.del<void>(`/activities/${id}`)
 }
 
+const Account = {
+    current: () => requests.get<User>('/account'),
+    login: (user: UserFormValues) => requests.post<User>('/account/login', user),
+    register: (user: UserFormValues) => requests.post<User>('/account/register', user)
+}
+
 const agent = {
-    Activites
+    Activites,
+    Account
 }
 
 export default agent;
