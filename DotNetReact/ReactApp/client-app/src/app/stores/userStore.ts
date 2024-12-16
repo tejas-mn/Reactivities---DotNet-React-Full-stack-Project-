@@ -2,7 +2,6 @@ import { makeAutoObservable, runInAction } from "mobx";
 import agent from "../api/agent";
 import { User, UserFormValues } from "../models/user";
 import { store } from "./store";
-import { history } from "../../main";
 import { router } from "../router/Routes";
 
 export default class UserStore {
@@ -20,7 +19,7 @@ export default class UserStore {
         try {
             const user = await agent.Account.login(creds);
             store.commonStore.setToken(user.token);
-            runInAction(() => this.user = user); 
+            runInAction(() => this.user = user);
             // history.push('/activities') //just url changes doesnt navigate
             router.navigate('/activities')
             store.modalStore.closeModal();
@@ -43,22 +42,19 @@ export default class UserStore {
             const user = await agent.Account.current();
             store.commonStore.setToken(user.token);
             runInAction(() => this.user = user);
-        } catch (error)
-        {
+        } catch (error) {
             console.log(error);
         }
     }
 
-    register = async (creds: UserFormValues) =>
-        {
-            try {
-                await agent.Account.register(creds);
-                // router.navigate(`/account/registerSuccess?email=${creds.email}`);
-                store.modalStore.closeModal();
-            } catch(error)
-            {
-                throw error;
-            }
+    register = async (creds: UserFormValues) => {
+        try {
+            await agent.Account.register(creds);
+            // router.navigate(`/account/registerSuccess?email=${creds.email}`);
+            store.modalStore.closeModal();
+        } catch (error) {
+            throw error;
         }
+    }
 
 }

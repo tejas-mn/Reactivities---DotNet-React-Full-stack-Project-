@@ -1,9 +1,10 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
-import { Activity } from "../models/activity";
+import { Activity, ActivityFormValues } from "../models/activity";
 import { toast } from "react-toastify";
 import { router } from "../router/Routes";
 import { store } from "../stores/store";
 import { User, UserFormValues } from "../models/user";
+import { Profile, UserActivity } from "../models/profile";
 
 const sleep = (delay: number) => {
     return new Promise((resolve) => {
@@ -77,9 +78,10 @@ const requests = {
 const Activites = {
     list: () => requests.get<Activity[]>('/activities'),
     details: (id: string) => requests.get<Activity>(`/activities/${id}`),
-    create: (activity: Activity) => requests.post<void>('/activities', activity),
-    update: (activity: Activity) => requests.put<void>(`/activities/${activity.id}`, activity),
-    delete: (id: string) => requests.del<void>(`/activities/${id}`)
+    create: (activity: ActivityFormValues) => requests.post<void>('/activities', activity),
+    update: (activity: ActivityFormValues) => requests.put<void>(`/activities/${activity.id}`, activity),
+    delete: (id: string) => requests.del<void>(`/activities/${id}`),
+    attend: (id: string) => requests.post<void>(`/activities/${id}/attend`, {})
 }
 
 const Account = {
@@ -88,9 +90,22 @@ const Account = {
     register: (user: UserFormValues) => requests.post<User>('/account/register', user)
 }
 
+const Profiles = {
+    get: (username: string) => requests.get<Profile>(`/profiles/${username}`),
+    setMainPhoto: (id: string) => requests.post(`/photos/${id}/setMain`, {}),
+    deletePhoto: (id: string) => requests.del(`/photos/${id}`),
+    updateProfile: (profile: Partial<Profile>) => requests.put<void>(`/profiles`, profile),
+    updateFollowing: (username: string) => requests.post(`/follow/${username}`, {}),
+    listFollowings: (username: string, predicate: string) =>
+        requests.get<Profile[]>(`/follow/${username}?predicate=${predicate}`),
+    listActivities: (username: string, predicate: string) =>
+        requests.get<UserActivity[]>(`/profiles/${username}/activities?predicate=${predicate}`)
+}
+
 const agent = {
     Activites,
-    Account
+    Account,
+    Profiles
 }
 
 export default agent;

@@ -36,23 +36,5 @@ export default observer(function ActivityDetails() {
                 <ActivityDetailedSidebar activity={activity} />
             </Grid.Column>
         </Grid>
-        // <Card fluid>
-        //     <Image src='https://react.semantic-ui.com/images/avatar/large/matthew.png' wrapped ui={false} />
-        //     <CardContent>
-        //         <CardHeader>{activity.title}</CardHeader>
-        //         <CardMeta>
-        //             <span className='date'>{activity.date}</span>
-        //         </CardMeta>
-        //         <CardDescription>
-        //             {activity.description}
-        //         </CardDescription>
-        //     </CardContent>
-        //     <CardContent extra>
-        //         <Button.Group widths={2}>
-        //             <Button as = {Link} to ={`/manage/${activity.id}`} basic color='blue' content='Edit' />
-        //             <Button as = {Link} to ={`/activities`} basic color='grey' content='Cancel'  />
-        //         </Button.Group>
-        //     </CardContent>
-        // </Card>
     )
 })

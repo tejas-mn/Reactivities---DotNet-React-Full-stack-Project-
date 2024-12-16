@@ -5,6 +5,7 @@ import ValidationError from "./ValidationError";
 
 export default function TestErrors() {
     const baseUrl = 'https://super-duper-xylophone-jw7qvvx99gc967-5035.app.github.dev/api/';
+    
     const [errors, setErrors] = useState(null);
 
     function handleNotFound() {
@@ -12,7 +13,7 @@ export default function TestErrors() {
     }
 
     function handleBadRequest() {
-        axios.get(baseUrl + 'buggy/bad-request').catch(err => console.log(err.response));
+        axios.get(baseUrl + 'buggy/bad-request').catch(err => console.log(err.response)); 
     }
 
     function handleServerError() {

@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import { observer } from 'mobx-react-lite';
 import { Link } from 'react-router-dom';
-import { Button, Header, Item, Segment, Image } from 'semantic-ui-react'
+import { Button, Header, Item, Segment, Image, Label } from 'semantic-ui-react'
 import { Activity } from "../../../app/models/activity";
 import { useStore } from '../../../app/stores/store';
 
@@ -23,16 +23,17 @@ interface Props {
 }
 
 export default observer(function ActivityDetailedHeader({ activity }: Props) {
-
-    const { activityStore: { loading } } = useStore();
+    const { activityStore: { updateAttendance, loading, cancelActivityToggle } } = useStore();
     return (
         <Segment.Group>
             <Segment basic attached='top' style={{ padding: '0' }}>
-                {/* {activity.isCancelled && 
-                    <Label style={{position: 'absolute', zIndex:1000, left:-14,top:20}} 
+                {activity.isCancelled &&
+                    <Label style={{ position: 'absolute', zIndex: 1000, left: -14, top: 20 }}
                         ribbon color='red' content='Cancelled' />
-                } */}
-                <Image src='https://img.freepik.com/free-vector/cartoon-mountain-landscape-with-foothpath-pine-forest-vector-illustration-majestic-peaks-horizon-green-grass-tall-trees-stones-ground-summer-scenery-hiking-recreation-travel_107791-21196.jpg' fluid style={activityImageStyle} />
+                }
+
+                <Image src={`https://img.freepik.com/free-vector/cartoon-mountain-landscape-with-foothpath-pine-forest-vector-illustration-majestic-peaks-horizon-green-grass-tall-trees-stones-ground-summer-scenery-hiking-recreation-travel_107791-21196.jpg`} fluid style={activityImageStyle} />
+
                 <Segment style={activityImageTextStyle} basic>
                     <Item.Group>
                         <Item>
@@ -44,7 +45,7 @@ export default observer(function ActivityDetailedHeader({ activity }: Props) {
                                 />
                                 <p>{format(activity.date!, 'dd MMM yyyy')}</p>
                                 <p>
-                                    Hosted by <strong>Bob</strong>
+                                    Hosted by <strong><Link to={`/profiles/${activity.host?.userName}`} >{activity.host?.displayName}</Link> </strong>
                                 </p>
                             </Item.Content>
                         </Item>
@@ -52,9 +53,36 @@ export default observer(function ActivityDetailedHeader({ activity }: Props) {
                 </Segment>
             </Segment>
             <Segment clearing attached='bottom'>
-                <Button loading={loading} color='teal'>  Join Activity </Button>
-                <Button loading={loading} >  Cancel attendance</Button>
-                <Button as={Link} to={`/manage/${activity.id}`} loading={loading} color='orange' floated='right'> Manage Event </Button>
+                {activity.isHost ? (
+                    <>
+                        <Button
+                            color={activity.isCancelled ? 'green' : 'red'}
+                            floated='left'
+                            basic
+                            content={activity.isCancelled ? 'Re-activate Activity' : 'Cancel Activity'}
+                            onClick={cancelActivityToggle}
+                            loading={loading}
+                        />
+                        <Button
+                            disabled={activity.isCancelled}
+                            as={Link}
+                            to={`/manage/${activity.id}`}
+                            color='orange'
+                            floated='right'>
+                            Manage Event
+                        </Button>
+                    </>
+                ) : activity.isGoing ? (
+                    <Button loading={loading} onClick={updateAttendance} >Cancel attendance</Button>
+                ) : (
+                    <Button
+                        disabled={activity.isCancelled}
+                        loading={loading}
+                        onClick={updateAttendance}
+                        color='teal'>
+                        Join Activity
+                    </Button>
+                )}
             </Segment>
         </Segment.Group>
     )
