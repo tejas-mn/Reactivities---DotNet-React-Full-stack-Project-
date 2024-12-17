@@ -25,7 +25,7 @@ namespace Infrastructure.Security
         {
             var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
             
-            if(userId == null) return Task.CompletedTask;
+            if(userId == null) return  Task.CompletedTask;
 
             //getting activity id from http request
             var activityId = Guid.Parse(_httpContext.HttpContext?.Request.RouteValues.SingleOrDefault(x => x.Key == "id").Value?.ToString());
@@ -41,7 +41,7 @@ namespace Infrastructure.Security
             //if for activity current user is host then he is authorized
             if(attendee.IsHost) context.Succeed(requirement);
 
-            return Task.CompletedTask;
+            return  Task.CompletedTask;
         }
     }
 }

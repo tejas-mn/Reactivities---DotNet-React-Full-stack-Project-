@@ -4,9 +4,8 @@ using Application.Core;
 using Application.Interfaces;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Infrastructure.Photos;
 using Infrastructure.Security;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
@@ -22,11 +21,11 @@ namespace API.Extensions
             services.AddAuthentication();
             services.AddAuthentication();
             services.AddControllers( opt => {
-                var policy = new AuthorizationPolicyBuilder()
-                                .RequireAuthenticatedUser()
-                                .Build();
-                //applies auth filter to the actions/methods from the controllers instead of using [Authorize] Attribute but doesn't display lock icon in swagger so better to use [Authorize]
-                opt.Filters.Add(new AuthorizeFilter(policy)); 
+                // var policy = new AuthorizationPolicyBuilder()
+                //                 .RequireAuthenticatedUser()
+                //                 .Build();
+                // //applies auth filter to the actions/methods from the controllers instead of using [Authorize] Attribute but doesn't display lock icon in swagger so better to use [Authorize]
+                // opt.Filters.Add(new AuthorizeFilter(policy)); 
             });
 
             services.AddDbContext<DataContext>( opt => {
@@ -42,6 +41,8 @@ namespace API.Extensions
 
             services.AddHttpContextAccessor();
             services.AddScoped<IUserAccessor, UserAccessor>();
+            services.AddScoped<IPhotoAccessor, PhotoAccessor>();
+            services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
             return services;
         }
     }
