@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { router } from "../router/Routes";
 import { store } from "../stores/store";
 import { User, UserFormValues } from "../models/user";
-import { Profile, UserActivity } from "../models/profile";
+import { Photo, Profile, UserActivity } from "../models/profile";
 
 const sleep = (delay: number) => {
     return new Promise((resolve) => {
@@ -12,7 +12,7 @@ const sleep = (delay: number) => {
     })
 }
 
-axios.defaults.baseURL = 'https://super-duper-xylophone-jw7qvvx99gc967-5035.app.github.dev/api/';
+axios.defaults.baseURL = 'https://studious-space-trout-9769prpvr47p2977v-5035.app.github.dev/api/';
 
 axios.interceptors.request.use(config => {
     const token = store.commonStore.token;
@@ -92,6 +92,13 @@ const Account = {
 
 const Profiles = {
     get: (username: string) => requests.get<Profile>(`/profiles/${username}`),
+    uploadPhoto: (file: Blob) => {
+        let formData = new FormData();
+        formData.append('File', file);
+        return axios.post<Photo>('photos', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
+    },
     setMainPhoto: (id: string) => requests.post(`/photos/${id}/setMain`, {}),
     deletePhoto: (id: string) => requests.del(`/photos/${id}`),
     updateProfile: (profile: Partial<Profile>) => requests.put<void>(`/profiles`, profile),

@@ -21,7 +21,7 @@ export default function NavBar() {
                     <Image src={user?.image || "https://png.pngtree.com/png-vector/20240824/ourlarge/pngtree-the-logo-of-nature-with-its-background-png-image_13604277.png"} avatar spaced='right' />
                     <Dropdown pointing='top left' text={user?.displayName}>
                         <Dropdown.Menu>
-                            <Dropdown.Item as={Link} to={`/profiles/${user?.username}`}
+                            <Dropdown.Item as={Link} to={`/profiles/${user?.userName}`}
                                 text="My Profile" icon='user' />
                             <Dropdown.Item onClick={logout} text="Logout" icon='power' />
                         </Dropdown.Menu>
