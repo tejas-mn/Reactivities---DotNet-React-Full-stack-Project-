@@ -1,5 +1,6 @@
 using API.Extensions;
 using API.Middleware;
+using API.SignalR;
 using Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -30,19 +31,23 @@ app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHub<ChatHub>("/chat");
 
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
 
-try{
+try
+{
     var context = services.GetRequiredService<DataContext>();
     var userManager = services.GetRequiredService<UserManager<AppUser>>(); //gets userManager for AppUser to inject the service into SeedData method
     context.Database.Migrate(); //runs migration to create tables in db
     await Seed.SeedData(context, userManager);
 
-}catch(Exception ex){
+}
+catch (Exception ex)
+{
     var logger = services.GetRequiredService<ILogger<Program>>();
     logger.LogError(ex, "An error occured during migrations");
 }
 
-app.Run();
+app.Run("http://localhost:5000/"); //5000 for SignalR ws

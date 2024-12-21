@@ -20,7 +20,8 @@ namespace API.Extensions
             services.AddSwaggerGen();
             services.AddAuthentication();
             services.AddAuthentication();
-            services.AddControllers( opt => {
+            services.AddControllers(opt =>
+            {
                 // var policy = new AuthorizationPolicyBuilder()
                 //                 .RequireAuthenticatedUser()
                 //                 .Build();
@@ -28,11 +29,15 @@ namespace API.Extensions
                 // opt.Filters.Add(new AuthorizeFilter(policy)); 
             });
 
-            services.AddDbContext<DataContext>( opt => {
+            services.AddDbContext<DataContext>(opt =>
+            {
                 opt.UseSqlite(config.GetConnectionString("DefaultConnection"));
             });
-            services.AddCors(opt => {
-                opt.AddPolicy("CorsPolicy", policy => policy.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin());
+            services.AddCors(opt =>
+            {
+                opt.AddPolicy("CorsPolicy", policy => policy.AllowAnyMethod().AllowAnyHeader()
+                .AllowCredentials() // For SignarR
+                .WithOrigins("https://studious-space-trout-9769prpvr47p2977v-5173.app.github.dev"));
             });
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(List.Handler).Assembly));
             services.AddAutoMapper(typeof(MappingProfile).Assembly);
@@ -43,6 +48,7 @@ namespace API.Extensions
             services.AddScoped<IUserAccessor, UserAccessor>();
             services.AddScoped<IPhotoAccessor, PhotoAccessor>();
             services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
+            services.AddSignalR();
             return services;
         }
     }
