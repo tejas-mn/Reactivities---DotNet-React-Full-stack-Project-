@@ -32,7 +32,7 @@ export default class ProfileStore {
 
     }
 
-    setActiveTab = (activeTab: any) => {
+    setActiveTab = (activeTab: number) => {
         this.activeTab = activeTab;
     }
 
@@ -164,7 +164,7 @@ export default class ProfileStore {
     }
 
     loadFollowings = async (predicate: string) => {
-        this.loading = true;
+        this.loadingFollowings = true;
         try {
             const followings = await agent.Profiles.listFollowings(this.profile!.userName, predicate);
             runInAction(() => {
