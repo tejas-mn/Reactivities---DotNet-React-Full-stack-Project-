@@ -16,7 +16,7 @@ export default class CommentStore {
     createHubConnection = (activityId: string) => {
         if (store.activityStore.selectedActivity) {
             this.hubConnection = new HubConnectionBuilder()
-                .withUrl('https://studious-space-trout-9769prpvr47p2977v-5000.app.github.dev/chat' + '?activityId=' + activityId, {
+                .withUrl( import.meta.env.VITE_CHAT_URL+'/chat' + '?activityId=' + activityId, {
                     // we pass our token
                     accessTokenFactory: () => store.userStore.user?.token!
                 })

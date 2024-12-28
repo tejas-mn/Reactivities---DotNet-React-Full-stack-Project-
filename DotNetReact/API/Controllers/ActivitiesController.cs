@@ -8,12 +8,11 @@ namespace API.Controllers
     [Authorize]
     public class ActivitiesController : BaseController
     {
-
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get([FromQuery] ActivityParams param)
         {
-            var result = await Mediator.Send(new List.Query());
-            return HandleResult(result);
+            var result = await Mediator.Send(new List.Query {Params = param});
+            return HandlePagedResult(result);
         }
 
         [HttpGet("{id}")]

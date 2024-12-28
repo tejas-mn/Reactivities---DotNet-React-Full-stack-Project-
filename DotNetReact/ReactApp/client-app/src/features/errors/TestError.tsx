@@ -4,7 +4,7 @@ import { useState } from "react";
 import ValidationError from "./ValidationError";
 
 export default function TestErrors() {
-    const baseUrl = 'https://super-duper-xylophone-jw7qvvx99gc967-5035.app.github.dev/api/';
+    const baseUrl = import.meta.env.VITE_API_URL;
     
     const [errors, setErrors] = useState(null);
 

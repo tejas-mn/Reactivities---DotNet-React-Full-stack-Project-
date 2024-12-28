@@ -5,6 +5,7 @@ import { router } from "../router/Routes";
 import { store } from "../stores/store";
 import { User, UserFormValues } from "../models/user";
 import { Photo, Profile, UserActivity } from "../models/profile";
+import { PaginatedResult } from "../models/pagination";
 
 const sleep = (delay: number) => {
     return new Promise((resolve) => {
@@ -12,7 +13,7 @@ const sleep = (delay: number) => {
     })
 }
 
-axios.defaults.baseURL = 'https://studious-space-trout-9769prpvr47p2977v-5000.app.github.dev/api/';
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
 axios.interceptors.request.use(config => {
     const token = store.commonStore.token;
@@ -21,7 +22,14 @@ axios.interceptors.request.use(config => {
 })
 
 axios.interceptors.response.use(async res => {
-    await sleep(1000);
+    if(import.meta.env.DEV) await sleep(1000);
+    
+    const pagination = res.headers['pagination'];
+    if(pagination){
+        res.data = new PaginatedResult(res.data, JSON.parse(pagination));
+        return res as AxiosResponse<PaginatedResult<any>>;
+    }
+
     return res;
 }, (err: AxiosError) => {
     const { data, status, config } = err.response as AxiosResponse;
@@ -76,7 +84,7 @@ const requests = {
 }
 
 const Activites = {
-    list: () => requests.get<Activity[]>('/activities'),
+    list: (params: URLSearchParams) => axios.get<PaginatedResult<Activity[]>>('/activities', {params}).then(responseBody),
     details: (id: string) => requests.get<Activity>(`/activities/${id}`),
     create: (activity: ActivityFormValues) => requests.post<void>('/activities', activity),
     update: (activity: ActivityFormValues) => requests.put<void>(`/activities/${activity.id}`, activity),

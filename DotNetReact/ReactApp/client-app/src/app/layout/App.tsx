@@ -9,6 +9,7 @@ import ModalContainer from '../common/modals/ModalContainer';
 import LoadingComponent from './LoadingComponent';
 import { useStore } from '../stores/store';
 import { useEffect } from 'react';
+import { ScrollRestoration } from 'react-router-dom';
 
 function App() {
   const location = useLocation();
@@ -27,6 +28,7 @@ function App() {
 
   return (
     <>
+      <ScrollRestoration />
       <ToastContainer position='bottom-right' hideProgressBar theme='colored' />
       <ModalContainer />
       {

@@ -1,3 +1,4 @@
+using Applcation.Core;
 using Application.Core;
 using Application.Interfaces;
 using AutoMapper;
@@ -10,9 +11,12 @@ namespace Application.Activities
 {
     public class List
     {
-        public class Query : IRequest<Result<List<ActivityDto>>> { }
+        public class Query : IRequest<Result<PagedList<ActivityDto>>> 
+        { 
+            public ActivityParams Params {get; set;}
+        }
 
-        public class Handler : IRequestHandler<Query, Result<List<ActivityDto>>>
+        public class Handler : IRequestHandler<Query, Result<PagedList<ActivityDto>>>
         {
             private readonly DataContext _context;
             private readonly IMapper _mapper;
@@ -25,24 +29,38 @@ namespace Application.Activities
                 _userAccessor = userAccessor;
             }
 
-            public async Task<Result<List<ActivityDto>>> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<Result<PagedList<ActivityDto>>> Handle(Query request, CancellationToken cancellationToken)
             {
                 try
                 {
-                    var result = await _context.Activities
-                                               .ProjectTo<ActivityDto>(_mapper.ConfigurationProvider, 
-                                                        new {currentUserName = _userAccessor.GetUserName()})
-                                               //    .Include(a => a.Attendees)
-                                               //    .ThenInclude(a => a.AppUser)
-                                               .ToListAsync(cancellationToken);
+                    var query = _context.Activities
+                                    .Where(d => d.Date > request.Params.StartDate)
+                                    .OrderBy(d => d.Date)
+                                    .ProjectTo<ActivityDto>(_mapper.ConfigurationProvider, 
+                                            new {currentUserName = _userAccessor.GetUserName()})
+                                    //    .Include(a => a.Attendees)
+                                    //    .ThenInclude(a => a.AppUser)
+                                    .AsQueryable();
+
+                    if(request.Params.isGoing && !request.Params.IsHost)
+                    {
+                        query = query.Where(x => x.Attendees.Any(a => a.UserName == _userAccessor.GetUserName()));
+                    }
+
+                    if(request.Params.IsHost && !request.Params.isGoing)
+                    {
+                        query = query.Where(x => x.HostUserName == _userAccessor.GetUserName());
+                    }
 
                     // var activities = _mapper.Map<List<ActivityDto>>(result);
 
-                    return Result<List<ActivityDto>>.Success(result);
+                    return Result<PagedList<ActivityDto>>.Success(
+                        await PagedList<ActivityDto>.CreateAsync(query, request.Params.PageNumber, request.Params.PageSize)
+                    );
                 }
                 catch (Exception ex)
                 {
-                    return Result<List<ActivityDto>>.Failure(ex.Message);
+                    return Result<PagedList<ActivityDto>>.Failure(ex.Message);
                 }
 
             }
