@@ -1,0 +1,85 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  publishDirectory: '$(Build.ArtifactStagingDirectory)/publish'
+
+stages:
+  - stage: Build
+    displayName: Build Stage
+    jobs:
+      - job: Build
+        displayName: Build Job
+        steps:
+          # Checkout the source code
+          - task: Checkout@1
+
+          # Set up Node.js environment for React app
+          - task: NodeTool@0
+            inputs:
+              versionSpec: '20.x'
+            displayName: 'Set up Node.js'
+
+          # Install and build React app
+          - script: |
+              cd client-app
+              npm install
+              npm run build
+            displayName: 'Build React app'
+
+          # Restore and build ASP.NET Core app
+          - task: UseDotNet@2
+            inputs:
+              packageType: sdk
+              version: '8.x'
+              includePreviewVersions: true
+
+          - script: |
+              dotnet restore
+              dotnet build --configuration $(buildConfiguration)
+            displayName: 'Build .NET app'
+
+          # Publish ASP.NET Core app
+          - script: |
+              dotnet publish --configuration $(buildConfiguration) --output $(publishDirectory)
+            displayName: 'Publish .NET app'
+
+          # Publish artifacts for deployment
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: '$(publishDirectory)'
+              ArtifactName: 'drop'
+              publishLocation: 'Container'
+
+  - stage: Deploy
+    displayName: Deploy Stage
+    dependsOn: Build
+    jobs:
+      - deployment: Deploy
+        displayName: Deploy to Azure Web App
+        environment: 'Production'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                # Download build artifacts
+                - task: DownloadBuildArtifacts@0
+                  inputs:
+                    buildType: 'current'
+                    downloadType: 'single'
+                    artifactName: 'drop'
+                    downloadPath: '$(System.ArtifactsDirectory)'
+
+                # Deploy to Azure Web App
+                - task: AzureWebApp@1
+                  inputs:
+                    azureSubscription: 'YourAzureSubscription'
+                    appType: 'webApp'
+                    appName: 'YourAzureWebAppName'
+                    package: '$(System.ArtifactsDirectory)/drop'

@@ -38,7 +38,7 @@ namespace API.Extensions
             {
                 opt.AddPolicy("CorsPolicy", policy => policy.AllowAnyMethod().AllowAnyHeader()
                 .AllowCredentials() // For SignarR
-                .WithOrigins("https://studious-space-trout-9769prpvr47p2977v-5173.app.github.dev"));
+                .WithOrigins(config.GetConnectionString("ClientURL")));
             });
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(List.Handler).Assembly));
             services.AddAutoMapper(typeof(MappingProfile).Assembly);
