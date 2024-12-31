@@ -22,22 +22,24 @@ axios.interceptors.request.use(config => {
 })
 
 axios.interceptors.response.use(async res => {
-    if(import.meta.env.DEV) await sleep(1000);
-    
+    if (import.meta.env.DEV) await sleep(1000);
+
     const pagination = res.headers['pagination'];
-    if(pagination){
+    if (pagination) {
         res.data = new PaginatedResult(res.data, JSON.parse(pagination));
         return res as AxiosResponse<PaginatedResult<any>>;
     }
 
     return res;
 }, (err: AxiosError) => {
-    const { data, status, config } = err.response as AxiosResponse;
+    const { data, status, config, headers } = err.response as AxiosResponse;
 
     switch (status) {
         case 400:
             if (typeof data === 'string') {
-                toast.error(data);
+                toast.error(data, {
+                    position: 'top-center'
+                });
             }
 
             else if (config.method === 'get' && data.errors.hasOwnProperty('id')) {
@@ -53,14 +55,27 @@ axios.interceptors.response.use(async res => {
                 }
                 throw modalstateErrors.flat();
             } else {
-                toast.error(data);
+                toast.error(data, {
+                    position: 'top-center'
+                });
             }
             break;
         case 401:
-            toast.error('unauthorized');
+            if (status === 401 && headers['www-authenticate']?.startsWith('Bearer error="invalid_token')) {
+                store.userStore.logout();
+                toast.error('Session Expired - please log in again', {
+                    position: 'top-center'
+                });
+            } else {
+                toast.error('Unauthorised', {
+                    position: 'top-center'
+                });
+            }
             break;
         case 403:
-            toast.error('forbidden');
+            toast.error('Forbidden', {
+                position: 'top-center'
+            });
             break;
         case 404:
             router.navigate('/not-found')
@@ -84,7 +99,7 @@ const requests = {
 }
 
 const Activites = {
-    list: (params: URLSearchParams) => axios.get<PaginatedResult<Activity[]>>('/activities', {params}).then(responseBody),
+    list: (params: URLSearchParams) => axios.get<PaginatedResult<Activity[]>>('/activities', { params }).then(responseBody),
     details: (id: string) => requests.get<Activity>(`/activities/${id}`),
     create: (activity: ActivityFormValues) => requests.post<void>('/activities', activity),
     update: (activity: ActivityFormValues) => requests.put<void>(`/activities/${activity.id}`, activity),
@@ -95,7 +110,10 @@ const Activites = {
 const Account = {
     current: () => requests.get<User>('/account'),
     login: (user: UserFormValues) => requests.post<User>('/account/login', user),
-    register: (user: UserFormValues) => requests.post<User>('/account/register', user)
+    register: (user: UserFormValues) => requests.post<User>('/account/register', user),
+    refreshToken: () => requests.post<User>('/account/refreshToken', {}),
+    fbLogin: (accessToken: string) => requests
+        .post<User>(`/account/fbLogin?accessToken=${accessToken}`, {}),
 }
 
 const Profiles = {

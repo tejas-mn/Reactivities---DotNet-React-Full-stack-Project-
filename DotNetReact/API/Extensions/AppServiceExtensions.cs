@@ -36,9 +36,13 @@ namespace API.Extensions
             });
             services.AddCors(opt =>
             {
-                opt.AddPolicy("CorsPolicy", policy => policy.AllowAnyMethod().AllowAnyHeader()
-                .AllowCredentials() // For SignarR
-                .WithOrigins(config.GetConnectionString("ClientURL")));
+                opt.AddPolicy("CorsPolicy", policy => policy
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .WithExposedHeaders("WWW-Authenticate", "Pagination") //Manually expose these headers to client
+                    .AllowCredentials() // For SignarR
+                    .WithOrigins(config.GetConnectionString("ClientURL"))
+                );
             });
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(List.Handler).Assembly));
             services.AddAutoMapper(typeof(MappingProfile).Assembly);
