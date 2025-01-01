@@ -32,9 +32,9 @@ app.UseXXssProtection(opt => opt.EnabledWithBlockMode());
 // blocking iframe
 app.UseXfo(opt => opt.Deny());
 
-app.UseCsp(opt => opt
+app.UseCspReportOnly(opt => opt //UseCspReportOnly on Dev Env for loading swagger 
     .BlockAllMixedContent()
-    // we're gonna allow below sources from our domain
+    // we're gonna allow below sources from our domain (api server)
     .StyleSources(s => s.Self().CustomSources("https://fonts.googleapis.com",
     "sha256-yChqzBduCCi4o4xdbXRXh4U/t1rP4UUUMJt+rB+ylUI="))
     .FontSources(s => s.Self().CustomSources("https://fonts.gstatic.com", "data:"))

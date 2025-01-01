@@ -41,7 +41,7 @@ namespace API.Extensions
                     .AllowAnyHeader()
                     .WithExposedHeaders("WWW-Authenticate", "Pagination") //Manually expose these headers to client
                     .AllowCredentials() // For SignarR
-                    .WithOrigins(config.GetConnectionString("ClientURL"))
+                    .WithOrigins(config.GetConnectionString("ClientURL")) //Add client url with https as well for fbLogin
                 );
             });
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(List.Handler).Assembly));

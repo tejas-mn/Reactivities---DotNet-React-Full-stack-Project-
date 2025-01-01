@@ -112,8 +112,8 @@ const Account = {
     login: (user: UserFormValues) => requests.post<User>('/account/login', user),
     register: (user: UserFormValues) => requests.post<User>('/account/register', user),
     refreshToken: () => requests.post<User>('/account/refreshToken', {}),
-    fbLogin: (accessToken: string) => requests
-        .post<User>(`/account/fbLogin?accessToken=${accessToken}`, {}),
+    fbLogin: (accessTokenFromFb: string) =>
+        requests.post<User>(`/account/fbLogin?accessToken=${accessTokenFromFb}`, {}),
 }
 
 const Profiles = {

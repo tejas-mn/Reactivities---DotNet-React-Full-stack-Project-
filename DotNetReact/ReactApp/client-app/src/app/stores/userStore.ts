@@ -90,8 +90,20 @@ export default class UserStore {
 
     }
 
-    facebookLogin = () => {
-
+    facebookLogin = async (accessTokenFromFb: string) => {
+        try {
+            this.fbLoading = true;
+            const user = await agent.Account.fbLogin(accessTokenFromFb);
+            store.commonStore.setToken(user.token);
+            runInAction(() => {
+                this.user = user;
+                this.fbLoading = false;
+            })
+            router.navigate('/activities');
+        } catch (error) {
+            console.error(error);
+            runInAction(() => this.fbLoading = false);
+        }
     }
 
     refreshToken = async () => {

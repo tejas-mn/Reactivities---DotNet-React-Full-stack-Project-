@@ -13,13 +13,20 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class AccountController : ControllerBase
     {
+        private readonly IConfiguration _config;
         private readonly UserManager<AppUser> _userManager;
         private readonly TokenService _tokenService;
+        private readonly HttpClient _httpClient;
 
-        public AccountController(UserManager<AppUser> userManager, TokenService tokenService)
+        public AccountController(UserManager<AppUser> userManager, TokenService tokenService, IConfiguration config)
         {
+            _config = config;
             _userManager = userManager;
             _tokenService = tokenService;
+            _httpClient = new HttpClient
+            {
+                BaseAddress = new Uri("https://graph.facebook.com")
+            };
         }
 
         [AllowAnonymous]
@@ -127,6 +134,52 @@ namespace API.Controllers
             };
 
             Response.Cookies.Append("refreshToken", refreshToken.Token, cookieOptions);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("fbLogin")]
+        public async Task<ActionResult<UserDto>> FacebookLogin(string accessToken)
+        {
+            //verify access token received is for our FB App
+            var fbverifyKeys = _config["Facebook:AppId"] + "|" + _config["Facebook:ApiSecret"];
+            var verifyTokenResponse = await _httpClient
+                                        .GetAsync($"debug_token?input_token={accessToken}&access_token={fbverifyKeys}");
+
+            if (!verifyTokenResponse.IsSuccessStatusCode) return Unauthorized();
+
+            //once verified get the fb user profile
+            var fbUrl = $"me?access_token={accessToken}&fileds=name,email,picture.width(100).height(100)";
+
+            var fbInfo = await _httpClient.GetFromJsonAsync<FacebookDto>(fbUrl);
+
+            //get the existing user from Db and return it if it exists
+            var user = await _userManager.Users.Include(p => p.Photos)
+                .FirstOrDefaultAsync(x => x.Email == fbInfo.Email);
+
+            if (user != null) return CreateUserObject(user);
+
+            //if user doesn't exist create new user and persist in Db
+            user = new AppUser
+            {
+                DisplayName = fbInfo.Name,
+                Email = fbInfo.Email,
+                UserName = fbInfo.Email,
+                Photos = new List<Photo>
+                {
+                    new Photo
+                    {
+                        Id = "fb_" + fbInfo.Id,
+                        Url = fbInfo.Picture.Data.Url,
+                        IsMain = true
+                    }
+                }
+            };
+
+            var result = await _userManager.CreateAsync(user);
+
+            if (!result.Succeeded) return BadRequest("Problem creating user account");
+
+            return CreateUserObject(user);
         }
 
         private UserDto CreateUserObject(AppUser user)
