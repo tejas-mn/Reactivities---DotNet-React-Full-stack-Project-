@@ -32,19 +32,19 @@ app.UseXXssProtection(opt => opt.EnabledWithBlockMode());
 // blocking iframe
 app.UseXfo(opt => opt.Deny());
 
-app.UseCspReportOnly(opt => opt //UseCspReportOnly on Dev Env for loading swagger 
+app.UseCsp(opt => opt
     .BlockAllMixedContent()
     // we're gonna allow below sources from our domain (api server)
-    .StyleSources(s => s.Self().CustomSources("https://fonts.googleapis.com",
-    "sha256-yChqzBduCCi4o4xdbXRXh4U/t1rP4UUUMJt+rB+ylUI="))
+    .StyleSources(s => s.Self().CustomSources("https://fonts.googleapis.com", "sha256-yChqzBduCCi4o4xdbXRXh4U/t1rP4UUUMJt+rB+ylUI=",
+     "sha256-wkAU1AW/h8YFx0XlzvpTllAKnFEO2tw8aKErs5a26LY=")) //updated hash for swagger
     .FontSources(s => s.Self().CustomSources("https://fonts.gstatic.com", "data:"))
     .FormActions(s => s.Self())
     .FrameAncestors(s => s.Self())
-    .ImageSources(s => s.Self().CustomSources("https://res.cloudinary.com", "https://www.facebook.com", "data:"))
+    .ImageSources(s => s.Self().CustomSources("https://res.cloudinary.com", "https://www.facebook.com", "data:", "blob:", "https://platform-lookaside.fbsx.com"))
     .ScriptSources(s => s.Self()
         .CustomSources(
-            "sha256-RZa9FeBeiqCM2+5jcE1mUKMkRZ69RNcOg/OAT6NWJ7Y=",
-            "sha256-rTuNa9UeAQ5B9gj9rLEY9243ZbVE6Sl++AiPas66JE4=",
+            "sha256-Tui7QoFlnLXkJCSl1/JvEZdIXTmBttnWNxzJpXomQjg=", //updated hashes for fb
+            "sha256-AaD233S3nLNrz8GvI5Ct4JgDe2xTKcgZbhIdfyO3wrA=",
             "https://connect.facebook.net"
         )
     )
