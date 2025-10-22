@@ -5,17 +5,16 @@ namespace Application.Core
 {
   public class MappingProfile : AutoMapper.Profile
   {
-    public string currentUserName = null;
-    
     public MappingProfile()
     {
-      Console.WriteLine("DEBUG" + currentUserName);
       CreateMap<Activity, Activity>()
          .ForAllMembers(opt =>
            opt.Condition((src, dest, srcMember) =>
                srcMember != null &&
                  (!(srcMember is DateTime) || (DateTime?)srcMember != DateTime.MinValue)  //to keep the destination as it is if property not passed (null / min date) in request while updating
      ));
+
+      string currentUserName = null;
 
       CreateMap<ActivityAttendee, AttendeeDto>()
         .ForMember(d => d.DisplayName, p => p.MapFrom(s => s.AppUser.DisplayName))
