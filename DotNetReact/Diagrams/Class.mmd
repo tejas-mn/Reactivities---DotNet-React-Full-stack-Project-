@@ -1,0 +1,101 @@
+---
+config:
+  theme: dark
+---
+classDiagram
+  class Activity {
+    +Guid Id
+    +string Title
+    +string Description
+    +string Category
+    +DateTime Date
+    +string City
+    +string Venue
+    +bool IsCancelled
+    +ICollection~ActivityAttendee~ Attendees
+    +ICollection~Comment~ Comments
+  }
+  class AppUser {
+    +string Id
+    +string UserName
+    +string DisplayName
+    +string Email
+    +string Bio
+    +ICollection~Photo~ Photos
+    +ICollection~ActivityAttendee~ Activities
+    +ICollection~UserFollowing~ Followings
+    +ICollection~UserFollowing~ Followers
+    +ICollection~RefreshToken~ RefreshTokens
+  }
+  class Photo {
+    +string Id
+    +string Url
+    +bool IsMain
+    +string PublicId
+    +AppUser Owner
+  }
+  class ActivityAttendee {
+    +Guid ActivityId
+    +string AppUserId
+    +bool IsHost
+    +DateTime DateJoined
+    +Activity Activity
+    +AppUser AppUser
+  }
+  class Comment {
+    +Guid Id
+    +string Body
+    +DateTime CreatedAt
+    +string AuthorId
+    +Guid ActivityId
+    +AppUser Author
+    +Activity Activity
+  }
+  class UserFollowing {
+    +string ObserverId
+    +string TargetId
+    +DateTime CreatedAt
+    +AppUser Observer
+    +AppUser Target
+  }
+  class RefreshToken {
+    +Guid Id
+    +string Token
+    +DateTime Expires
+    +DateTime Created
+    +DateTime? Revoked
+    +AppUser User
+  }
+  class ActivityDto {
+    +Guid Id
+    +string Title
+    +string Category
+    +DateTime Date
+    +string HostUsername
+    +ICollection~AttendeeDto~ Attendees
+  }
+  class AttendeeDto {
+    +string Username
+    +string DisplayName
+    +string Image
+    +bool IsHost
+  }
+  class CommentDto {
+    +Guid Id
+    +string Body
+    +DateTime CreatedAt
+    +string Username
+    +string DisplayName
+    +string Image
+  }
+  Activity "1" o-- "*" ActivityAttendee : attendees
+  AppUser "1" o-- "*" ActivityAttendee : attendeeLinks
+  Activity "1" o-- "*" Comment : comments
+  AppUser "1" o-- "*" Comment : authoredComments
+  AppUser "1" o-- "*" Photo : photos
+  AppUser "1" o-- "*" RefreshToken : tokens
+  AppUser "1" o-- "*" UserFollowing : followings
+  AppUser "1" o-- "*" UserFollowing : followers
+  ActivityDto <-- Activity : mappedFrom
+  AttendeeDto <-- AppUser : mappedFrom
+  CommentDto <-- Comment : mappedFrom

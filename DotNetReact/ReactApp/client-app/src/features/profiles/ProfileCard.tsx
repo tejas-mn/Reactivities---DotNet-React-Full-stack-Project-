@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { Link } from 'react-router-dom';
-import { Card, Icon, Image } from 'semantic-ui-react';
+import { Button, Card, Icon, Image } from 'semantic-ui-react';
 import { Profile } from '../../app/models/profile';
 import FollowButton from './FollowButton';
 
@@ -25,6 +25,7 @@ export default observer(function ProfileCard({ profile }: Props) {
                 </Card.Description>
             </Card.Content>
             <FollowButton profile={profile} />
+            <Button fluid content='Message' />
         </Card>
     )
 })

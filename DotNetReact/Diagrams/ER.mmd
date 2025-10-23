@@ -1,0 +1,63 @@
+---
+config:
+  theme: dark
+---
+erDiagram
+  ACTIVITY {
+    uuid Id PK
+    string Title
+    string Description
+    string Category
+    datetime Date
+    string City
+    string Venue
+    bool IsCancelled
+  }
+  APPUSER {
+    string Id PK
+    string UserName
+    string DisplayName
+    string Email
+    string Bio
+  }
+  PHOTO {
+    string Id PK
+    string Url
+    bool IsMain
+    string PublicId
+    string AppUserId FK
+  }
+  ACTIVITY_ATTENDEE {
+    uuid ActivityId
+    string AppUserId
+    bool IsHost
+    datetime DateJoined
+  }
+  COMMENT {
+    uuid Id PK
+    string Body
+    datetime CreatedAt
+    string AuthorId FK
+    uuid ActivityId FK
+  }
+  USER_FOLLOWING {
+    string ObserverId 
+    string TargetId
+    datetime CreatedAt
+  }
+  REFRESH_TOKEN {
+    uuid Id PK
+    string Token
+    datetime Expires
+    datetime Created
+    datetime Revoked
+    string AppUserId FK
+  }
+  ACTIVITY ||--o{ ACTIVITY_ATTENDEE : "has_attendees"
+  APPUSER ||--o{ ACTIVITY_ATTENDEE : "participates"
+  ACTIVITY ||--o{ COMMENT : "has_comments"
+  APPUSER ||--o{ COMMENT : "authors"
+  APPUSER ||--o{ PHOTO : "owns_photos"
+  APPUSER ||--o{ REFRESH_TOKEN : "has_tokens"
+  APPUSER ||--o{ USER_FOLLOWING : "observes"
+  APPUSER ||--o{ USER_FOLLOWING : "is_followed_by"

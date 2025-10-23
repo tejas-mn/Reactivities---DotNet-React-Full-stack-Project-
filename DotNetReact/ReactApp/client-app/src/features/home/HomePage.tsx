@@ -43,6 +43,9 @@ export default observer(function HomePage() {
                             }}
                             className={`ui button facebook huge inverted ${userStore.fbLoading && 'loading'}`}
                         />
+                         <Divider horizontal inverted>Or</Divider>
+                         <Button content='Login through Google' size='huge' inverted />
+                         <Button content='Login through GitHub' size='huge' inverted />
                     </>
                 )}
 

@@ -1,4 +1,4 @@
-import { Grid, Loader } from "semantic-ui-react";
+import { Dropdown, Grid, Loader } from "semantic-ui-react";
 import ActivityList from "./ActivityList";
 import { useStore } from "../../../app/stores/store";
 import { observer } from "mobx-react-lite";

@@ -68,7 +68,14 @@ export default observer(function AcitivityForm() {
                             <MyTextArea rows={3} placeholder='Description' name='description' />
                             <MySelectInput options={categoryOptions} placeholder='Category' name='category' />
                             <MyDateInput
-                                placeholderText='Date'
+                                placeholderText='Start Date'
+                                name="date"
+                                showTimeSelect
+                                timeCaption="time"
+                                dateFormat={'MMMM d, yyyy h:mm aa'}
+                            />
+                            <MyDateInput
+                                placeholderText='End Date'
                                 name="date"
                                 showTimeSelect
                                 timeCaption="time"
@@ -81,6 +88,7 @@ export default observer(function AcitivityForm() {
                                 disabled={isSubmitting || !dirty || !isValid}
                                 loading={isSubmitting} floated='right' positive type='submit' content='Submit' />
                             <Button as={Link} to='/activities' floated='right' type='button' color="grey" content='Cancel' />
+                            <Button as={Link} to='/activities' floated='left' type='button' color="red" content='Delete' />
                         </Form>
 
                 }

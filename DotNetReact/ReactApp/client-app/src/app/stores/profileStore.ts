@@ -123,7 +123,7 @@ export default class ProfileStore {
             runInAction(() => {
                 if (profile.displayName &&
                     profile.displayName !== store.userStore.user?.displayName) {
-                    store.userStore.setDisplayName(profile.displayName);
+                    store.userStore.setDisplayname(profile.displayName);
                 }
                 this.profile = { ...this.profile, ...profile as Profile };
                 this.loading = false;

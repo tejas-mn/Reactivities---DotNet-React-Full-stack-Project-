@@ -24,6 +24,7 @@ export default observer(function LoginForm(){
                         }
                     />
                     <Button loading={isSubmitting} positive content='Login' type='submit' fluid />
+                    <Button style={{marginTop: 10}} content='Forgot Password?' fluid basic color='blue' />
 
                 </Form>
             )}

@@ -83,6 +83,27 @@ export default observer(function ActivityDetailedHeader({ activity }: Props) {
                         Join Activity
                     </Button>
                 )}
+                <Button
+                        disabled={activity.isCancelled}
+                        loading={loading}
+                        onClick={updateAttendance}
+                        color='grey'>
+                        Start Event
+                    </Button>
+                     <Button
+                        disabled={activity.isCancelled}
+                        loading={loading}
+                        onClick={updateAttendance}
+                        color='grey'>
+                        End Event
+                    </Button>
+                <Button
+                        disabled={activity.isCancelled}
+                        loading={loading}
+                        onClick={updateAttendance}
+                        color='grey'>
+                        Meet Now
+                    </Button>
             </Segment>
         </Segment.Group>
     )
