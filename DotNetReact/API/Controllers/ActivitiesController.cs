@@ -1,3 +1,4 @@
+using API.Filters;
 using Application.Activities;
 using Domain;
 using Microsoft.AspNetCore.Authorization;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers
 {
     [Authorize]
+    [RequestTiming] 
     public class ActivitiesController : BaseController
     {
         [HttpGet]

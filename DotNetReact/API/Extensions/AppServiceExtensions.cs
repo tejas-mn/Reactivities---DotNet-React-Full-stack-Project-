@@ -1,11 +1,14 @@
+using API.Filters;
 using API.Middleware;
 using Application.Activities;
+using Application.Behaviours;
 using Application.Core;
 using Application.Interfaces;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.Photos;
 using Infrastructure.Security;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
@@ -20,6 +23,10 @@ namespace API.Extensions
             services.AddSwaggerGen();
             services.AddAuthentication();
             services.AddAuthentication();
+
+            services.AddScoped<RequestTimingFilter>(); // required for RequestTimingAttribute/TypeFilter
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CommandLoggingBehavior<,>));
+
             services.AddControllers(opt =>
             {
                 // var policy = new AuthorizationPolicyBuilder()
