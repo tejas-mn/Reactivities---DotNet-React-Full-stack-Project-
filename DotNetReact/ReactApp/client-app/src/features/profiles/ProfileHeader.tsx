@@ -1,13 +1,17 @@
 import { observer } from 'mobx-react-lite';
 import { Button, Divider, Grid, Header, Item, Segment, Statistic } from 'semantic-ui-react';
 import { Profile } from '../../app/models/profile';
+import { useStore } from '../../app/stores/store';
 import FollowButton from './FollowButton';
+import ProfileChatModal from './ProfileChatModal';
 
 interface Props {
     profile: Profile;
 }
 
 export default observer(function ProfileHeader({ profile }: Props) {
+    const { modalStore } = useStore();
+
     return (
         <Segment>
             <Grid>
@@ -28,7 +32,11 @@ export default observer(function ProfileHeader({ profile }: Props) {
                     </Statistic.Group>
                     <Divider />
                     <FollowButton profile={profile} />
-                    <Button fluid content='Message' />
+                    <Button
+                        fluid
+                        content='Message'
+                        onClick={() => modalStore.openModal(<ProfileChatModal profile={profile} />)}
+                    />
                 </Grid.Column>
             </Grid>
         </Segment>

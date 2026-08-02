@@ -15,7 +15,8 @@ export const routes: RouteObject[] = [
         element: <App />,
         children: [
             {
-                element: <RequireAuth />, children: [
+                element: <RequireAuth />, 
+                children: [
                     { path: 'activities', element: <ActivityDashboard /> },
                     { path: 'activities/:id', element: <ActivityDetails /> },
                     { path: 'createActivity', element: <ActivityForm key='create' /> }, //key resets state for the compo on each render
