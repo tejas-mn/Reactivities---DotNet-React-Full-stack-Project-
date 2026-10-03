@@ -7,6 +7,7 @@ import TestErrors from "../../features/errors/TestError";
 import NotFound from "../../features/errors/NotFound";
 import ServerError from "../../features/errors/ServerError";
 import ProfilePage from "../../features/profiles/ProfilePage";
+import MessagePage from "../../features/messages/MessagePage";
 import RequireAuth from "./RequireAuth";
 
 export const routes: RouteObject[] = [
@@ -22,6 +23,7 @@ export const routes: RouteObject[] = [
                     { path: 'createActivity', element: <ActivityForm key='create' /> }, //key resets state for the compo on each render
                     { path: 'manage/:id', element: <ActivityForm key='manage' /> },
                     { path: 'profiles/:username', element: <ProfilePage /> },
+                    { path: 'messages', element: <MessagePage /> },
                     { path: 'errors', element: <TestErrors /> },
                 ]
             },

@@ -1,9 +1,10 @@
-import { Button, Container, Menu, Image, Dropdown } from "semantic-ui-react";
+import { observer } from 'mobx-react-lite';
+import { Button, Container, Menu, Image, Dropdown, Label } from "semantic-ui-react";
 import { Link, NavLink } from "react-router-dom";
 import { useStore } from "../stores/store";
 
-export default function NavBar() {
-    const { userStore: { user, logout } } = useStore();
+export default observer(function NavBar() {
+    const { userStore: { user, logout }, privateChatStore } = useStore();
 
     return (
         <Menu inverted fixed='top'>
@@ -14,7 +15,14 @@ export default function NavBar() {
                 </Menu.Item>
                 <Menu.Item as={NavLink} to='/activities' name="Activities" />
                 <Menu.Item as={NavLink} to='/network' name="Network" />
-                <Menu.Item as={NavLink} to='/messages' name="Messages" />
+                <Menu.Item as={NavLink} to='/messages' onClick={() => privateChatStore.markMessagesRead()} style={{ position: 'relative' }}>
+                    Messages
+                    {privateChatStore.unreadCount > 0 && (
+                        <Label circular color='red' size='mini' style={{ position: 'absolute', top: '-1px', right: '-8px' }}>
+                            {privateChatStore.unreadCount}
+                        </Label>
+                    )}
+                </Menu.Item>
                 <Menu.Item as={NavLink} to='/errors' name="Errors" />
                 <Menu.Item>
                     <Button as={NavLink} to='/createActivity' positive content='Create Activity' />
@@ -35,4 +43,4 @@ export default function NavBar() {
             </Container>
         </Menu>
     )
-}
+})

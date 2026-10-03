@@ -6,6 +6,7 @@ import ModalStore from "./modalStore";
 import ProfileStore from "./profileStore";
 import CommentStore from "./commentStore";
 import PrivateChatStore from "./privateChatStore";
+import MessageStore from "./messageStore";
 
 interface Store {
     activityStore: ActivityStore
@@ -15,6 +16,7 @@ interface Store {
     profileStore: ProfileStore;
     commentStore: CommentStore;
     privateChatStore: PrivateChatStore;
+    messageStore: MessageStore;
 }
 
 //object storing multiple stores
@@ -26,6 +28,7 @@ export const store: Store = {
     profileStore: new ProfileStore(),
     commentStore: new CommentStore(),
     privateChatStore: new PrivateChatStore(),
+    messageStore: new MessageStore(),
 }
 
 //context for passing store across components

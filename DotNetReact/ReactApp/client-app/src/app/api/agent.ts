@@ -5,6 +5,7 @@ import { router } from "../router/Routes";
 import { store } from "../stores/store";
 import { User, UserFormValues } from "../models/user";
 import { Photo, Profile, UserActivity } from "../models/profile";
+import { MessageConversation } from "../models/message";
 import { PaginatedResult } from "../models/pagination";
 
 const sleep = (delay: number) => {
@@ -135,10 +136,15 @@ const Profiles = {
         requests.get<UserActivity[]>(`/profiles/${username}/activities?predicate=${predicate}`)
 }
 
+const Messages = {
+    list: () => requests.get<MessageConversation[]>('/messages')
+}
+
 const agent = {
     Activites,
     Account,
-    Profiles
+    Profiles,
+    Messages
 }
 
 export default agent;

@@ -9,7 +9,6 @@ namespace API.SignalR
     {
         private readonly IMediator _mediator;
         private static readonly ConcurrentDictionary<string, string> ConnectionUsers = new();
-        private static readonly ConcurrentDictionary<string, List<PrivateChatMessageDto>> Conversations = new();
 
         public ChatHub(IMediator mediator)
         {
@@ -32,8 +31,8 @@ namespace API.SignalR
                 return;
             }
 
-            var key = GetConversationKey(currentUserName, otherUserName);
-            var conversation = Conversations.GetValueOrDefault(key, new List<PrivateChatMessageDto>());
+            var key = ChatConversationStore.GetConversationKey(currentUserName, otherUserName);
+            var conversation = ChatConversationStore.GetConversation(key);
 
             await Clients.Caller.SendAsync("LoadConversation", conversation);
         }
@@ -55,8 +54,8 @@ namespace API.SignalR
                 CreatedAt = DateTime.UtcNow.ToString("O")
             };
 
-            var conversationKey = GetConversationKey(senderUserName, recipientUserName);
-            AddMessage(conversationKey, message);
+            var conversationKey = ChatConversationStore.GetConversationKey(senderUserName, recipientUserName);
+            ChatConversationStore.AddMessage(conversationKey, message);
 
             var recipientConnectionIds = ConnectionUsers.Where(x => x.Value.Equals(recipientUserName, StringComparison.OrdinalIgnoreCase))
                 .Select(x => x.Key)
@@ -101,33 +100,5 @@ namespace API.SignalR
             ConnectionUsers.TryRemove(Context.ConnectionId, out _);
             return base.OnDisconnectedAsync(exception);
         }
-
-        private static void AddMessage(string conversationKey, PrivateChatMessageDto message)
-        {
-            if (!Conversations.ContainsKey(conversationKey))
-            {
-                Conversations[conversationKey] = new List<PrivateChatMessageDto>();
-            }
-
-            Conversations[conversationKey].Add(message);
-        }
-
-        private static string GetConversationKey(string userOne, string userTwo)
-        {
-            var ordered = new[] { userOne, userTwo }
-                .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)
-                .ToArray();
-
-            return $"{ordered[0]}::{ordered[1]}";
-        }
-    }
-
-    public class PrivateChatMessageDto
-    {
-        public string Id { get; set; } = string.Empty;
-        public string SenderUserName { get; set; } = string.Empty;
-        public string RecipientUserName { get; set; } = string.Empty;
-        public string Content { get; set; } = string.Empty;
-        public string CreatedAt { get; set; } = string.Empty;
     }
 }

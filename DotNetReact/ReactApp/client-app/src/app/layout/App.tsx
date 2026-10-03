@@ -13,7 +13,7 @@ import { ScrollRestoration } from 'react-router-dom';
 
 function App() {
   const location = useLocation();
-  const { commonStore, userStore } = useStore();
+  const { commonStore, userStore, privateChatStore } = useStore();
 
   useEffect(() => {
     if (commonStore.token) {
@@ -23,6 +23,12 @@ function App() {
       commonStore.setAppLoaded();
     }
   }, [commonStore, userStore])
+
+  useEffect(() => {
+    if (userStore.isLoggedIn) {
+      privateChatStore.initializeGlobalNotificationListener();
+    }
+  }, [userStore.isLoggedIn, privateChatStore])
 
   if (!commonStore.appLoaded) return <LoadingComponent content='Loading app...' />
 

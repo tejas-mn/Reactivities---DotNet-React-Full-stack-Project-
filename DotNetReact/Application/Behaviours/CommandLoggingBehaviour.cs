@@ -16,7 +16,7 @@ namespace Application.Behaviours
 
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
-              var requestName = typeof(TRequest).Name;
+            var requestName = typeof(TRequest).Name;
             string reqSerialized;
             try { reqSerialized = JsonSerializer.Serialize(request, new JsonSerializerOptions { WriteIndented = false }); }
             catch { reqSerialized = request?.ToString() ?? "<null>"; }
