@@ -11,7 +11,7 @@ Elasticsearch: [http://localhost:9200](http://localhost:9200)
 Jaeger: [http://localhost:16686](http://localhost:16686)
 Zipkin: [http://localhost:9411](http://localhost:9411)
 
-In Kibana, create data views for `otel-traces*` and `otel-logs*` to explore the exported data.
+In Kibana, create data views for `otel-traces*` and `otel-logs-nanos*` to explore the exported data. New logs use Elasticsearch `date_nanos` precision; older logs remain in `otel-logs*` with millisecond precision.
 
 If the API runs in the same Docker Compose network, set `OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317`.
 
