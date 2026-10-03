@@ -10,10 +10,16 @@ exporters:
   elasticsearch:
     endpoints:
       - http://elasticsearch:9200
+    user: elastic
+    password: ${env:ELASTIC_PASSWORD}
     flush:
       interval: 1s
     logs_index: otel-logs-nanos
     traces_index: otel-traces
+  otlphttp/elastic-apm:
+    endpoint: http://apm-server:8200
+    headers:
+      Authorization: "Bearer ${env:ELASTIC_APM_SECRET_TOKEN}"
   otlp/jaeger:
     endpoint: jaeger:4317
     tls:
@@ -25,7 +31,7 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      exporters: [elasticsearch, otlp/jaeger, zipkin]
+      exporters: [otlphttp/elastic-apm, otlp/jaeger, zipkin]
     logs:
       receivers: [otlp]
       exporters: [elasticsearch]

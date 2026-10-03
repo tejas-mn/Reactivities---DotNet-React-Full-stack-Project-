@@ -1,5 +1,9 @@
 version: "3.8"
 
+x-elasticsearch-password: &elasticsearch-password "-Wf7VLv*gNLAHKOlomOf"
+x-elasticsearch-credentials: &elasticsearch-credentials
+  ELASTIC_PASSWORD: *elasticsearch-password
+
 services:
 
   sql:
@@ -30,6 +34,11 @@ services:
         condition: service_started
       zipkin:
         condition: service_started
+      apm-server:
+        condition: service_started
+    environment:
+      <<: *elasticsearch-credentials
+      ELASTIC_APM_SECRET_TOKEN: ${ELASTIC_APM_SECRET_TOKEN:-dev-apm-token-change-me}
     networks:
       - elk
 
@@ -52,8 +61,11 @@ services:
   elasticsearch:
     image: elasticsearch:8.7.1
     environment:
+      <<: *elasticsearch-credentials
       discovery.type: single-node
-      xpack.security.enabled: "false"
+      xpack.security.enabled: "true"
+      xpack.security.http.ssl.enabled: "false"
+      xpack.security.transport.ssl.enabled: "false"
       ES_JAVA_OPTS: -Xms512m -Xmx512m
     ports:
       - "9200:9200"
@@ -66,20 +78,76 @@ services:
     image: curlimages/curl:8.12.1
     entrypoint: ["/bin/sh", "-c"]
     command:
-      - "until curl -fsS http://elasticsearch:9200 >/dev/null; do sleep 2; done; curl -fsS -X PUT http://elasticsearch:9200/_index_template/otel-logs-nanos-template -H 'Content-Type: application/json' --data-raw '{\"index_patterns\":[\"otel-logs-nanos*\"],\"priority\":500,\"template\":{\"mappings\":{\"properties\":{\"@timestamp\":{\"type\":\"date_nanos\"}}}}}'"
+      - "until curl -fsS --user \"elastic:$$ELASTIC_PASSWORD\" http://elasticsearch:9200 >/dev/null; do sleep 2; done; curl -fsS --user \"elastic:$$ELASTIC_PASSWORD\" -X PUT http://elasticsearch:9200/_index_template/otel-logs-nanos-template -H 'Content-Type: application/json' --data-raw '{\"index_patterns\":[\"otel-logs-nanos*\"],\"priority\":500,\"template\":{\"mappings\":{\"properties\":{\"@timestamp\":{\"type\":\"date_nanos\"}}}}}'"
     depends_on:
       - elasticsearch
+    environment: *elasticsearch-credentials
+    networks:
+      - elk
+
+  apm-server:
+    image: docker.elastic.co/apm/apm-server:8.7.1
+    command: ["-e", "-c", "/usr/share/apm-server/apm-server.yml"]
+    volumes:
+      - ./apm-server.yml:/usr/share/apm-server/apm-server.yml:ro
+    environment:
+      <<: *elasticsearch-credentials
+      ELASTIC_APM_SECRET_TOKEN: ${ELASTIC_APM_SECRET_TOKEN:-dev-apm-token-change-me}
+    ports:
+      - "8200:8200"
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
     networks:
       - elk
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.7.1
     environment:
+      ELASTIC_PASSWORD: *elasticsearch-password
       ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
+      ELASTICSEARCH_USERNAME: kibana_system
+      ELASTICSEARCH_PASSWORD: "0IsYDPDmQ4Wk5ptS-Qm8"
+      XPACK_SECURITY_ENABLED: "true"
+      XPACK_FLEET_ENABLED: "true"
+      XPACK_FLEET_AGENTS_ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
+      XPACK_FLEET_AGENTS_FLEET_SERVER_HOSTS: '["http://fleet-server:8220"]'
     ports:
       - "5601:5601"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS --user \"elastic:$$ELASTIC_PASSWORD\" http://localhost:5601/api/status >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
     depends_on:
       - elasticsearch
+    networks:
+      - elk
+
+  fleet-server:
+    image: docker.elastic.co/beats/elastic-agent:8.7.1
+    environment:
+      FLEET_SERVER_ENABLE: "1"
+      FLEET_SERVER_INSECURE: "1"
+      FLEET_SERVER_ELASTICSEARCH_HOST: "http://elasticsearch:9200"
+      FLEET_SERVER_ELASTICSEARCH_USERNAME: elastic
+      FLEET_SERVER_ELASTICSEARCH_PASSWORD: *elasticsearch-password
+      FLEET_SERVER_HOST: "0.0.0.0"
+      FLEET_SERVER_PORT: "8220"
+      FLEET_SERVER_POLICY_ID: "fleet-server-policy"
+      KIBANA_HOST: "http://kibana:5601"
+      KIBANA_USERNAME: elastic
+      KIBANA_PASSWORD: *elasticsearch-password
+      KIBANA_FLEET_SETUP: "1"
+    ports:
+      - "8220:8220"
+    depends_on:
+      elasticsearch:
+        condition: service_started
+      kibana:
+        condition: service_healthy
+    restart: on-failure
     networks:
       - elk
 
