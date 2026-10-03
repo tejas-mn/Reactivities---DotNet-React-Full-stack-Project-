@@ -13,37 +13,60 @@ services:
       - sql_data:/var/opt/mssql
     restart: always
 
-  # elasticsearch:
-  #   image: elasticsearch:8.7.1
-  #   container_name: elasticsearch
-  #   ports:
-  #     - "9200:9200"
-  #     - "9300:9300"
-  #   environment:
-  #     - discovery.type=single-node
-  #     - xpack.security.enabled=false
-  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-  #   networks:
-  #     - elk
-  #   volumes:
-  #     - es_data:/usr/share/elasticsearch/data
-  #   mem_limit: ${ES_MEM_LIMIT}
-  #   ulimits:
-  #     memlock:
-  #       soft: -1
-  #       hard: -1
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.121.0
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    depends_on:
+      - elasticsearch
+      - jaeger
+      - zipkin
+    networks:
+      - elk
 
-  # kibana:
-  #   image: docker.elastic.co/kibana/kibana:8.7.1
-  #   container_name: kibana
-  #   ports:
-  #     - "5601:5601"
-  #   environment:
-  #     - ELASTICSEARCH_HOSTS= ${ELASTICSEARCH_HOSTS}
-  #   depends_on:
-  #     - elasticsearch
-  #   networks:
-  #     - elk
+  jaeger:
+    image: jaegertracing/all-in-one:1.62.0
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"
+    networks:
+      - elk
+
+  zipkin:
+    image: openzipkin/zipkin:3.5.1
+    ports:
+      - "9411:9411"
+    networks:
+      - elk
+
+  elasticsearch:
+    image: elasticsearch:8.7.1
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    networks:
+      - elk
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.7.1
+    environment:
+      ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - elk
 
 networks:
   elk:
