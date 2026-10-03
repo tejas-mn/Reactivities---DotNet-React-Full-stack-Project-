@@ -10,7 +10,9 @@ exporters:
   elasticsearch:
     endpoints:
       - http://elasticsearch:9200
-    logs_index: otel-logs
+    flush:
+      interval: 1s
+    logs_index: otel-logs-nanos
     traces_index: otel-traces
   otlp/jaeger:
     endpoint: jaeger:4317

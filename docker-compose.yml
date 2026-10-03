@@ -22,9 +22,14 @@ services:
       - "4317:4317"
       - "4318:4318"
     depends_on:
-      - elasticsearch
-      - jaeger
-      - zipkin
+      elasticsearch:
+        condition: service_started
+      elasticsearch-index-template:
+        condition: service_completed_successfully
+      jaeger:
+        condition: service_started
+      zipkin:
+        condition: service_started
     networks:
       - elk
 
@@ -54,6 +59,16 @@ services:
       - "9200:9200"
     volumes:
       - es_data:/usr/share/elasticsearch/data
+    networks:
+      - elk
+
+  elasticsearch-index-template:
+    image: curlimages/curl:8.12.1
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - "until curl -fsS http://elasticsearch:9200 >/dev/null; do sleep 2; done; curl -fsS -X PUT http://elasticsearch:9200/_index_template/otel-logs-nanos-template -H 'Content-Type: application/json' --data-raw '{\"index_patterns\":[\"otel-logs-nanos*\"],\"priority\":500,\"template\":{\"mappings\":{\"properties\":{\"@timestamp\":{\"type\":\"date_nanos\"}}}}}'"
+    depends_on:
+      - elasticsearch
     networks:
       - elk
 

@@ -52,6 +52,14 @@ namespace API.Extensions
                 );
             });
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(List.Handler).Assembly));
+            var handlerTypes = services
+                .Where(descriptor => descriptor.ServiceType.IsGenericType &&
+                    descriptor.ServiceType.GetGenericTypeDefinition() == typeof(IRequestHandler<,>) &&
+                    descriptor.ImplementationType is not null)
+                .GroupBy(descriptor => descriptor.ServiceType)
+                .ToDictionary(group => group.Key, group => group.Last().ImplementationType!);
+            services.AddSingleton<IReadOnlyDictionary<Type, Type>>(handlerTypes);
+
             services.AddAutoMapper(typeof(MappingProfile).Assembly);
             services.AddFluentValidationAutoValidation();
             services.AddValidatorsFromAssemblyContaining<Create>();
