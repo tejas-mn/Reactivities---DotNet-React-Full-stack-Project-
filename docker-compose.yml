@@ -58,6 +58,26 @@ services:
     networks:
       - elk
 
+  grafana:
+    image: grafana/grafana:11.5.2
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      ELASTIC_PASSWORD: *elasticsearch-password
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      elasticsearch:
+        condition: service_started
+      jaeger:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - elk
+
   elasticsearch:
     image: elasticsearch:8.7.1
     environment:
@@ -157,6 +177,9 @@ networks:
 
 volumes:
   es_data:
+    driver: local
+
+  grafana_data:
     driver: local
 
   sql_data:
